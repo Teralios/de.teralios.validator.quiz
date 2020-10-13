@@ -1,6 +1,6 @@
 <?php
 
-namespace wcf\data\quiz\validator;
+namespace wcf\system\quiz;
 
 /**
  * Class QuizValidatorResult

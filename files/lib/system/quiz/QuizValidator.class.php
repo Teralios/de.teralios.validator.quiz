@@ -1,9 +1,8 @@
 <?php
 
-namespace wcf\data\quiz\validator;
+namespace wcf\system\quiz;
 
 // imports
-use wcf\system\exception\SystemException;
 use wcf\system\language\LanguageFactory;
 use wcf\util\ArrayUtil;
 use wcf\util\JSON;
