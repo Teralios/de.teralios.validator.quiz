@@ -2,3 +2,10 @@
 # de.teralios.validator.quiz
 Validator for quiz json files.
 
+#Todo
+  - [ ] Overwork base validator
+  - [ ] Add option to save quiz from file direct. (no more json encoding after validation)
+  - [ ] Better error message
+  - [ ] Better check of values
+  - [ ] ???
+
