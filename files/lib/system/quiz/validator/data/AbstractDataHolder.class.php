@@ -23,7 +23,7 @@ abstract class AbstractDataHolder implements IDataHolder
 
     public static function getDataValues(): array
     {
-        $reflector = new ReflectionClass(static::class);
+        $reflector = new \ReflectionClass(static::class);
         if ($reflector->hasConstant('DATA_VALUES')) {
             return static::DATA_VALUES;
         }
@@ -33,7 +33,7 @@ abstract class AbstractDataHolder implements IDataHolder
 
     public static function getDataKeys(): array
     {
-        $reflector = new ReflectionClass(static::class);
+        $reflector = new \ReflectionClass(static::class);
         if ($reflector->hasConstant('DATA_KEYS')) {
             return static::DATA_KEYS;
         }

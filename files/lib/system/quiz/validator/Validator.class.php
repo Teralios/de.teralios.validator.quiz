@@ -44,6 +44,10 @@ class Validator
     {
         $dataHolder = new $this->className();
 
+        // only for remove warning. ;)
+        if ($this->className === null) {
+            return new ValidatorError('test');
+        }
 
         static::setValidateData($this->key, $dataHolder);
         return null;
@@ -76,7 +80,7 @@ class Validator
 
     public static function getDataValidator(): callable
     {
-        function (string $key, string $jsonRaw) {
+        return function (string $key, string $jsonRaw) {
             $validator = new static();
             $validator->setData($key, $jsonRaw);
 
