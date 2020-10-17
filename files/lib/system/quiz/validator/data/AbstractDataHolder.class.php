@@ -8,12 +8,7 @@ abstract class AbstractDataHolder implements IDataHolder
 
     public function setData(string $key, $value)
     {
-        list($type,) = self::getDataValues();
-        if ($type === 'array') {
-            $this->data[$key][] = $value;
-        } else {
-            $this->data[$key] = $value;
-        }
+        $this->data[$key] = $value;
     }
 
     public function getData(string $key)

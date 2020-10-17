@@ -16,7 +16,7 @@ class Validator
      */
     protected static $quizStorage = [];
 
-    protected $filename = '';
+    protected $key = '';
     protected $rawData = '';
     protected $data = [];
     protected $className = Quiz::class;
@@ -36,14 +36,22 @@ class Validator
 
     public function setData(string $key, string $jsonString)
     {
+        $this->key = $key;
+        $this->rawData = $jsonString;
     }
 
     public function validate()
     {
+        $dataHolder = new $this->className();
 
+
+        static::setValidateData($this->key, $dataHolder);
         return null;
     }
 
+    /**
+     * @return ValidatorError|array|string|int
+     */
     protected function validateChild()
     {
     }
