@@ -102,40 +102,34 @@ class Validator
     /**
      * @return ValidatorError|IDataHolder
      */
-    protected function validateData(array $data, string $className, int $depth = 0)
+    protected function validateData(array $data, string $className)
     {
         $this->checkClass($className);
         /** @var IDataHolder $dataHolder */
         $dataHolder = new $className();
         $dataKeys = $dataHolder->getDataKeys();
 
+        $index = 0;
         foreach ($dataKeys as $key => $settings) {
-            list($isRequired, $type, $validData) = $settings;
+            list($isRequired, $type, $dataOptions) = $settings;
 
             if ($isRequired && (!isset($data[$key]) || empty($data[$key]))) {
-                return new ValidatorError($key, $depth);
+                return new ValidatorError($key, $index);
             }
 
             $rawValue = $data[$key];
             if (!$this->checkType($rawValue, $type)) {
-                return new ValidatorError($key, $depth, ValidatorError::ERROR_TYPE);
+                return new ValidatorError($key, $index, ValidatorError::ERROR_TYPE);
             }
 
-            if ($type == static::TYPE_ARRAY) {
-                if (empty($validData)) {
-                    throw new SystemException('Check needs a IDataHolder class.');
-                }
-
-                $value = $this->validateData($rawValue, $validData, $depth + 1);
-            } elseif ($type == static::TYPE_STRING && is_array($validData)) {
-                $value = (!in_array($rawValue, $validData)) ? new ValidatorError($key, $depth, ValidatorError::ERROR_INVALID) : $rawValue;
-            }
+            $value = $this->checkData($key, $index, $type, $rawValue, $dataOptions);
 
             if ($value instanceof ValidatorError) {
                 return $value;
             }
 
             $dataHolder->setData($key, $value);
+            $index++;
         }
 
         return $dataHolder;
@@ -143,19 +137,42 @@ class Validator
 
     protected function checkType($value, int $type): bool
     {
-        if ($type == static::TYPE_STRING && !is_string($value)) {
-            return false;
+        switch ($type) {
+            case static::TYPE_STRING:
+                return is_string($value);
+            case static::TYPE_INT:
+                return is_integer($value);
+            case static::TYPE_ARRAY:
+                return is_array($value);
+            default:
+                return true;
+        }
+    }
+
+    protected function checkData(string $key, int $index, int $type, $value, $dataOptions)
+    {
+        switch ($type) {
+            case static::TYPE_ARRAY:
+                $value = $this->validateData($value, $dataOptions);
+                if ($value instanceof ValidatorError) {
+                    $value->setParent(new ValidatorError($key, $index, ValidatorError::ERROR_INVALID));
+                }
+                return $value;
+            case static::TYPE_STRING:
+                return $this->checkString($key, $index, $value, $dataOptions);
+            case static::TYPE_INT:
+            default:
+                return (int) $value;
+        }
+    }
+
+    protected function checkString(string $key, int $index, string $value, $neededStrings)
+    {
+        if (is_array($neededStrings) && !in_array($value, $neededStrings)) {
+            return new ValidatorError($key, $index, Validator::TYPE_STRING);
         }
 
-        if ($type == static::TYPE_INT && !is_integer($value)) {
-            return false;
-        }
-
-        if ($type == static::TYPE_ARRAY && !is_array($value)) {
-            return false;
-        }
-
-        return true;
+        return $value;
     }
 
     /**
