@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/2019/language.xsd" languagecode="en" languagename="English" countrycode="gb">
+	<category name="wcf.acp.validator">
+		<item name="wcf.acp.validator.quiz.file.extension"><![CDATA[Wrong file extension.]]></item>
+		<item name="wcf.acp.validator.quiz.data"><![CDATA[<p>Error in <code>JSON</code> data.</p>
+{assign var='information' value=$error->getInformation()['details']}
+{assign var='parentNode' value=$information->getParent()}
+{if $parentNode !== null}<p>Error in entry <code>{$parentNode->getKey()}[<b>{$parentNode->getIndex()}</b>]</code></p>{/if}
+<p>
+	{if $information->getType() == 1}Entry <code>{$information->getKey()}</code> is missing or empty.{/if}
+	{if $information->getType() == 2}Entry <code>{$information->getKey()}</code> has wrong data type.{/if}
+	{if $information->getType() == 3}Entry <code>{$information->getKey()}</code> contains wrong data.{/if}
+</p>]]></item>
+	</category>
+</language>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/vortex/language.xsd" languagecode="de">
+	<category name="wcf.acp.validator">
+		<item name="wcf.acp.validator.quiz.file.extension"><![CDATA[Falsche Dateiendung.]]></item>
+		<item name="wcf.acp.validator.quiz.data"><![CDATA[<p>Die <code>JSON</code>-Daten sind fehlerhaft!</p>
+{assign var='information' value=$error->getInformation()['details']}
+{assign var='parentNode' value=$information->getParent()}
+{if $parentNode !== null}<p>Fehler im Eintrag <code>{$parentNode->getKey()}[<b>{$parentNode->getIndex()}</b>]</code></p>{/if}
+<p>
+	{if $information->getType() == 1}Der Eintrag <code>{$information->getKey()}</code> fehlt oder enthält keine Daten{/if}
+	{if $information->getType() == 2}Der Eintrag <code>{$information->getKey()}</code> hat einen falschen Datentyp.{/if}
+	{if $information->getType() == 3}Der Eintrag <code>{$information->getKey()}</code> enthält falsche Daten.{/if}
+</p>]]></item>
+	</category>
+</language>

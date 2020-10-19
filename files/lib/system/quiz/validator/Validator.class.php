@@ -14,6 +14,7 @@ use wcf\system\quiz\validator\data\IDataHolder;
 use wcf\system\quiz\validator\data\Quiz;
 use wcf\util\ArrayUtil;
 use wcf\util\JSON;
+use wcf\util\StringUtil;
 
 /**
  * Class        Validator
@@ -60,6 +61,16 @@ class Validator
     protected $className = Quiz::class;
 
     /**
+     * @var string
+     */
+    protected $parentNode = '';
+
+    /**
+     * @var int
+     */
+    protected $parentIndex = 0;
+
+    /**
      * Validator constructor.
      * @param string $className
      */
@@ -89,11 +100,10 @@ class Validator
     {
         // json data
         try {
-            $data = ArrayUtil::trim(JSON::decode($this->rawData));
+            $data = ArrayUtil::trim(JSON::decode($this->rawData), false);
         } catch (SystemException $e) {
             return new ValidatorError('quiz');
         }
-
         $dataHolder = $this->validateData($data, $this->className);
 
         if ($dataHolder instanceof IDataHolder) {
@@ -119,14 +129,13 @@ class Validator
         $dataKeys = $dataHolder->getDataKeys();
 
         // check data array
-        $index = 0;
         foreach ($dataKeys as $key => $settings) {
             list($isRequired, $type, $dataOptions) = $settings;
 
             // data exists and is required?
             if (!$this->dataExists($key, $data)) {
                 if ($isRequired) {
-                    return new ValidatorError($key, $index);
+                    return new ValidatorError($key);
                 }
 
                 continue;
@@ -135,18 +144,17 @@ class Validator
             // check type.
             $rawValue = $data[$key];
             if (!$this->checkType($rawValue, $type)) {
-                return new ValidatorError($key, $index, ValidatorError::ERROR_TYPE);
+                return new ValidatorError($key, ValidatorError::ERROR_TYPE);
             }
 
             // check data
-            $value = $this->checkValue($key, $index, $type, $rawValue, $dataOptions);
+            $value = $this->checkValue($key, $type, $rawValue, $dataOptions);
             if ($value instanceof ValidatorError) {
                 return $value;
             }
 
             // set validate data to data holder.
             $dataHolder->setData($key, $value);
-            $index++;
         }
 
         return $dataHolder;
@@ -160,7 +168,7 @@ class Validator
      */
     protected function dataExists(string $key, array $data)
     {
-        return (isset($data[$key]) || empty($data[$key]));
+        return (isset($data[$key]) || (!empty($data[$key]) && $data[$key] !== 0));
     }
 
     /**
@@ -174,8 +182,6 @@ class Validator
         switch ($type) {
             case static::TYPE_STRING:
                 return is_string($value);
-            case static::TYPE_INT:
-                return is_integer($value);
             case static::TYPE_ARRAY:
                 return is_array($value);
             default:
@@ -186,23 +192,25 @@ class Validator
     /**
      * Checks data value.
      * @param string $key
-     * @param int $index
      * @param int $type
      * @param $value
      * @param $dataOptions
      * @return int|string|IDataHolder|ValidatorError
      */
-    protected function checkValue(string $key, int $index, int $type, $value, $dataOptions)
+    protected function checkValue(string $key, int $type, $value, $dataOptions)
     {
         switch ($type) {
             case static::TYPE_ARRAY:
-                $value = $this->validateData($value, $dataOptions);
+                $this->parentNode = $key;
+                $value = $this->checkArray($value, $dataOptions);
                 if ($value instanceof ValidatorError) {
-                    $value->setParent(new ValidatorError($key, $index, ValidatorError::ERROR_INVALID));
+                    $value->setParent(new ValidatorError($key, ValidatorError::ERROR_INVALID, $this->parentIndex));
                 }
                 return $value;
+
             case static::TYPE_STRING:
-                return $this->checkString($key, $index, $value, $dataOptions);
+                return $this->checkString($key, $value, $dataOptions);
+
             case static::TYPE_INT:
             default:
                 return (int) $value;
@@ -210,17 +218,40 @@ class Validator
     }
 
     /**
+     * Checks a data array with IDataHolder class.
+     * @param $values
+     * @param $dataOptions
+     * @return array|IDataHolder|ValidatorError
+     */
+    protected function checkArray($values, $dataOptions){
+        $returnValues = [];
+        $index = 1;
+        foreach ($values as $value) {
+            $value = $this->validateData($value, $dataOptions);
+
+            if ($value instanceof ValidatorError) {
+                $this->parentIndex = $index;
+                return $value;
+            }
+
+            $returnValues[] = $value;
+            $index++;
+        }
+
+        return $returnValues;
+    }
+
+    /**
      * Checks string.
      * @param string $key
-     * @param int $index
      * @param string $value
-     * @param $neededStrings
+     * @param mixed $neededStrings
      * @return string|ValidatorError
      */
-    protected function checkString(string $key, int $index, string $value, $neededStrings)
+    protected function checkString(string $key, string $value, $neededStrings)
     {
         if (is_array($neededStrings) && !in_array($value, $neededStrings)) {
-            return new ValidatorError($key, $index, Validator::TYPE_STRING);
+            return new ValidatorError($key, Validator::TYPE_STRING);
         }
 
         return $value;
@@ -295,17 +326,9 @@ class Validator
             $name = $file->getFilename();
 
             // file extension
-            $lastDot = strrpos($name, '.');
-            if ($lastDot !== false) {
-                $extension = substr($name, $lastDot + 1);
-
-                if ($extension !== 'json') {
-                    $formField->addValidationError(new FormFieldValidationError('fileExtension', 'wcf.acp.quizCreator.import.error.file'));
+            if (!StringUtil::endsWith($name, '.quiz') && !StringUtil::endsWith($name, '.json')) {
+                    $formField->addValidationError(new FormFieldValidationError('fileExtension', 'wcf.acp.validator.quiz.file.extension'));
                     return;
-                }
-            } else {
-                $formField->addValidationError(new FormFieldValidationError('unknownExtension', 'wcf.acp.quizCreator.import.error.unknown'));
-                return;
             }
 
             // json test
@@ -314,7 +337,7 @@ class Validator
 
             if ($jsonError !== null) {
                 $formField->addValidationError(
-                    new FormFieldValidationError('json', 'wcf.acp.quizCreator.import.error.json', ['details' => $jsonError])
+                    new FormFieldValidationError('json', 'wcf.acp.validator.quiz.data', ['details' => $jsonError])
                 );
             }
         };
@@ -335,7 +358,7 @@ class Validator
 
                 if ($jsonError !== null) {
                     $formField->addValidationError(
-                        new FormFieldValidationError('json', 'wcf.acp.quizCreator.import.error.json', ['details' => $jsonError])
+                        new FormFieldValidationError('json', 'wcf.acp.validator.quiz.data', ['details' => $jsonError])
                     );
                 }
             }
