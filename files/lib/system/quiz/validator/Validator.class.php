@@ -3,43 +3,84 @@
 namespace wcf\system\quiz\validator;
 
 // imports
+use ReflectionClass;
+use ReflectionException;
+use wcf\system\exception\ImplementationException;
+use wcf\system\exception\SystemException;
 use wcf\system\form\builder\field\MultilineTextFormField;
 use wcf\system\form\builder\field\UploadFormField;
 use wcf\system\form\builder\field\validation\FormFieldValidationError;
 use wcf\system\quiz\validator\data\IDataHolder;
 use wcf\system\quiz\validator\data\Quiz;
 
+/**
+ * Class        Validator
+ * @package     QuizCreator
+ * @subpackage  wcf\system\quiz\validator
+ * @author      Karsten (Teralios) Achterrath
+ * @copyright   ©2020 Teralios.de
+ * @license     GNU General Public License <https://www.gnu.org/licenses/gpl-3.0.txt>
+ */
 class Validator
 {
+    const TYPE_STRING = 1;
+    const TYPE_INT = 2;
+    const TYPE_ARRAY = 3;
+
     /**
      * @var IDataHolder[]
      */
     protected static $quizStorage = [];
 
+    /**
+     * @var string
+     */
+    protected static $lastKey;
+
+    /**
+     * @var string
+     */
     protected $key = '';
+
+    /**
+     * @var string
+     */
     protected $rawData = '';
+
+    /**
+     * @var array
+     */
     protected $data = [];
+
+    /**
+     * @var string
+     */
     protected $className = Quiz::class;
 
+    /**
+     * Validator constructor.
+     * @param string $className
+     */
     public function __construct(string $className = '')
     {
         if (!empty($className)) {
             $this->className = $className;
         }
-
-        $this->checkClass();
     }
 
-    protected function checkClass()
-    {
-    }
-
+    /**
+     * @param string $key
+     * @param string $jsonString
+     */
     public function setData(string $key, string $jsonString)
     {
         $this->key = $key;
         $this->rawData = $jsonString;
     }
 
+    /**
+     * @return ValidatorError|null
+     */
     public function validate()
     {
         $dataHolder = new $this->className();
@@ -49,15 +90,85 @@ class Validator
             return new ValidatorError('test');
         }
 
-        static::setValidateData($this->key, $dataHolder);
-        return null;
+        $dataHolder = $this->validateDate($this->key, $dataHolder);
+
+        if ($dataHolder instanceof IDataHolder) {
+            static::setValidateData($this->key, $dataHolder);
+        }
+
+        return ($dataHolder instanceof ValidatorError) ? $dataHolder : null;
     }
 
     /**
-     * @return ValidatorError|array|string|int
+     * @return ValidatorError|IDataHolder
      */
-    protected function validateChild()
+    protected function validateData(array $data, string $className, int $depth = 0)
     {
+        $this->checkClass($className);
+        /** @var IDataHolder $dataHolder */
+        $dataHolder = new $className();
+        $dataKeys = $dataHolder->getDataKeys();
+
+        foreach ($dataKeys as $key => $settings) {
+            list($isRequired, $type, $validData) = $settings;
+
+            if ($isRequired && (!isset($data[$key]) || empty($data[$key]))) {
+                return new ValidatorError($key, $depth);
+            }
+
+            $rawValue = $data[$key];
+            if (!$this->checkType($rawValue, $type)) {
+                return new ValidatorError($key, $depth, ValidatorError::ERROR_TYPE);
+            }
+
+            if ($type == static::TYPE_ARRAY) {
+                if (empty($validData)) {
+                    throw new SystemException('Check needs a IDataHolder class.');
+                }
+
+                $value = $this->validateData($rawValue, $validData, $depth + 1);
+            } elseif ($type == static::TYPE_STRING && is_array($validData)) {
+                $value = (!in_array($rawValue, $validData)) ? new ValidatorError($key, $depth, ValidatorError::ERROR_INVALID) : $rawValue;
+            }
+
+            if ($value instanceof ValidatorError) {
+                return $value;
+            }
+
+            $dataHolder->setData($key, $value);
+        }
+
+        return $dataHolder;
+    }
+
+    protected function checkType($value, int $type): bool
+    {
+        if ($type == static::TYPE_STRING && !is_string($value)) {
+            return false;
+        }
+
+        if ($type == static::TYPE_INT && !is_integer($value)) {
+            return false;
+        }
+
+        if ($type == static::TYPE_ARRAY && !is_array($value)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $className
+     * @throws ReflectionException
+     */
+    protected function checkClass($className)
+    {
+        $reflection = new ReflectionClass($className);
+
+        if (!$reflection->implementsInterface(IDataHolder::class)) {
+            throw new ImplementationException($className, IDataHolder::class);
+        }
     }
 
     /**
@@ -67,6 +178,7 @@ class Validator
     protected static function setValidateData(string $key, IDataHolder $dataHolder)
     {
         static::$quizStorage[$key] = $dataHolder;
+        static::$lastKey = $key;
     }
 
     /**
@@ -78,6 +190,17 @@ class Validator
         return static::$quizStorage[$key] ?? null;
     }
 
+    /**
+     * @return IDataHolder|null
+     */
+    public static function getLastValidatedData()
+    {
+        return static::getData(static::$lastKey);
+    }
+
+    /**
+     * @return callable
+     */
     public static function getDataValidator(): callable
     {
         return function (string $key, string $jsonRaw) {
@@ -88,6 +211,9 @@ class Validator
         };
     }
 
+    /**
+     * @return callable
+     */
     public static function getUploadFieldValidator(): callable
     {
         return function (UploadFormField $formField) {
@@ -120,6 +246,9 @@ class Validator
         };
     }
 
+    /**
+     * @return callable
+     */
     public static function getTextFieldValidator(): callable
     {
         return function (MultilineTextFormField $formField) {

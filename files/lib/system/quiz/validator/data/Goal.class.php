@@ -2,19 +2,15 @@
 
 namespace wcf\system\quiz\validator\data;
 
+// imports
+use wcf\system\quiz\validator\Validator;
+
 class Goal extends AbstractDataHolder
 {
     const DATA_KEYS = [
-        'title' => true,
-        'icon' => true,
-        'description' => false,
-        'points' => true
-    ];
-
-    const DATA_VALUES = [
-        'title' => 'string',
-        'icon' => 'string',
-        'description' => 'string',
-        'points' => 'int',
+        'title' => [true, Validator::TYPE_STRING, null],
+        'icon' => [true, Validator::TYPE_STRING, null],
+        'description' => [false, Validator::TYPE_STRING, null],
+        'points' => [true, Validator::TYPE_INT, null]
     ];
 }

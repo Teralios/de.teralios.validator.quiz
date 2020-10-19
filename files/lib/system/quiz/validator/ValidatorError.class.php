@@ -6,6 +6,7 @@ class ValidatorError
 {
     const ERROR_REQUIRED = 1;
     const ERROR_TYPE = 2;
+    const ERROR_INVALID = 3;
     protected $type;
     protected $key;
     protected $index;

@@ -21,16 +21,6 @@ abstract class AbstractDataHolder implements IDataHolder
         return $this->getData($name);
     }
 
-    public static function getDataValues(): array
-    {
-        $reflector = new \ReflectionClass(static::class);
-        if ($reflector->hasConstant('DATA_VALUES')) {
-            return static::DATA_VALUES;
-        }
-
-        return [];
-    }
-
     public static function getDataKeys(): array
     {
         $reflector = new \ReflectionClass(static::class);

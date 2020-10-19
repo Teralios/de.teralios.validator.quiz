@@ -2,24 +2,19 @@
 
 namespace wcf\system\quiz\validator\data;
 
+// imports
+use wcf\system\quiz\validator\Validator;
+
 class Quiz extends AbstractDataHolder implements IRawData
 {
     const DATA_KEYS = [
-        'title' => true,
-        'type' => true,
-        'description' => true,
-        'questions' => true,
-        'goals' => false,
-        'tags' => false
-    ];
-
-    const DATA_VALUES = [
-        'title' => ['string'],
-        'type' => ['string', ['fun', 'competition']],
-        'description' => ['string'],
-        'questions' => ['array', Question::class],
-        'goals' => ['array', Goal::class],
-        'tags' => ['array', Tag::class]
+        'title' => [true, Validator::TYPE_STRING, null],
+        'type' => [true, Validator::TYPE_STRING, ['fun', 'competition']],
+        'languageCode' => [false, Validator::TYPE_STRING, 2],
+        'description' => [true, Validator::TYPE_STRING, null],
+        'questions' => [true, Validator::TYPE_ARRAY, Question::class],
+        'goals' => [false, Validator::TYPE_ARRAY, Goal::class],
+        'tags' => [false, Validator::TYPE_ARRAY, Tag::class]
     ];
 
     protected $rawData;
