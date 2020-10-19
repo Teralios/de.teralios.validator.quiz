@@ -219,11 +219,12 @@ class Validator
 
     /**
      * Checks a data array with IDataHolder class.
-     * @param $values
-     * @param $dataOptions
+     * @param array $values
+     * @param string $dataOptions
      * @return array|IDataHolder|ValidatorError
      */
-    protected function checkArray($values, $dataOptions){
+    protected function checkArray($values, $dataOptions)
+    {
         $returnValues = [];
         $index = 1;
         foreach ($values as $value) {
