@@ -105,6 +105,8 @@ class Validator
 
     /**
      * Validate data array.
+     * @param array $data
+     * @param string $className
      * @return ValidatorError|IDataHolder
      */
     protected function validateData(array $data, string $className)
@@ -122,7 +124,6 @@ class Validator
             list($isRequired, $type, $dataOptions) = $settings;
 
             // data exists and is required?
-            $dataExists = $this->dataExists();
             if (!$this->dataExists($key, $data)) {
                 if ($isRequired) {
                     return new ValidatorError($key, $index);
@@ -157,7 +158,7 @@ class Validator
      * @param string $key
      * @return bool
      */
-    protected function dataExists($data, string $key)
+    protected function dataExists(string $key, array $data)
     {
         return (isset($data[$key]) || empty($data[$key]));
     }
