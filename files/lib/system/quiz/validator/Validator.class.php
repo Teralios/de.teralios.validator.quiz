@@ -12,6 +12,8 @@ use wcf\system\form\builder\field\UploadFormField;
 use wcf\system\form\builder\field\validation\FormFieldValidationError;
 use wcf\system\quiz\validator\data\IDataHolder;
 use wcf\system\quiz\validator\data\Quiz;
+use wcf\util\ArrayUtil;
+use wcf\util\JSON;
 
 /**
  * Class        Validator
@@ -69,6 +71,7 @@ class Validator
     }
 
     /**
+     * Set data for validation.
      * @param string $key
      * @param string $jsonString
      */
@@ -79,18 +82,19 @@ class Validator
     }
 
     /**
+     * Validate data.
      * @return ValidatorError|null
      */
     public function validate()
     {
-        $dataHolder = new $this->className();
-
-        // only for remove warning. ;)
-        if ($this->className === null) {
-            return new ValidatorError('test');
+        // json data
+        try {
+            $data = ArrayUtil::trim(JSON::decode($this->rawData));
+        } catch (SystemException $e) {
+            return new ValidatorError('quiz');
         }
 
-        $dataHolder = $this->validateDate($this->key, $dataHolder);
+        $dataHolder = $this->validateData($data, $this->className);
 
         if ($dataHolder instanceof IDataHolder) {
             static::setValidateData($this->key, $dataHolder);
@@ -100,34 +104,46 @@ class Validator
     }
 
     /**
+     * Validate data array.
      * @return ValidatorError|IDataHolder
      */
     protected function validateData(array $data, string $className)
     {
+        // check class name.
         $this->checkClass($className);
+
         /** @var IDataHolder $dataHolder */
         $dataHolder = new $className();
         $dataKeys = $dataHolder->getDataKeys();
 
+        // check data array
         $index = 0;
         foreach ($dataKeys as $key => $settings) {
             list($isRequired, $type, $dataOptions) = $settings;
 
-            if ($isRequired && (!isset($data[$key]) || empty($data[$key]))) {
-                return new ValidatorError($key, $index);
+            // data exists and is required?
+            $dataExists = $this->dataExists();
+            if (!$this->dataExists($key, $data)) {
+                if ($isRequired) {
+                    return new ValidatorError($key, $index);
+                }
+
+                continue;
             }
 
+            // check type.
             $rawValue = $data[$key];
             if (!$this->checkType($rawValue, $type)) {
                 return new ValidatorError($key, $index, ValidatorError::ERROR_TYPE);
             }
 
-            $value = $this->checkData($key, $index, $type, $rawValue, $dataOptions);
-
+            // check data
+            $value = $this->checkValue($key, $index, $type, $rawValue, $dataOptions);
             if ($value instanceof ValidatorError) {
                 return $value;
             }
 
+            // set validate data to data holder.
             $dataHolder->setData($key, $value);
             $index++;
         }
@@ -135,6 +151,23 @@ class Validator
         return $dataHolder;
     }
 
+    /**
+     * Data exists and is not empty.
+     * @param $data
+     * @param string $key
+     * @return bool
+     */
+    protected function dataExists($data, string $key)
+    {
+        return (isset($data[$key]) || empty($data[$key]));
+    }
+
+    /**
+     * Checks data type..
+     * @param $value
+     * @param int $type
+     * @return bool
+     */
     protected function checkType($value, int $type): bool
     {
         switch ($type) {
@@ -149,7 +182,16 @@ class Validator
         }
     }
 
-    protected function checkData(string $key, int $index, int $type, $value, $dataOptions)
+    /**
+     * Checks data value.
+     * @param string $key
+     * @param int $index
+     * @param int $type
+     * @param $value
+     * @param $dataOptions
+     * @return int|string|IDataHolder|ValidatorError
+     */
+    protected function checkValue(string $key, int $index, int $type, $value, $dataOptions)
     {
         switch ($type) {
             case static::TYPE_ARRAY:
@@ -166,6 +208,14 @@ class Validator
         }
     }
 
+    /**
+     * Checks string.
+     * @param string $key
+     * @param int $index
+     * @param string $value
+     * @param $neededStrings
+     * @return string|ValidatorError
+     */
     protected function checkString(string $key, int $index, string $value, $neededStrings)
     {
         if (is_array($neededStrings) && !in_array($value, $neededStrings)) {
@@ -176,6 +226,7 @@ class Validator
     }
 
     /**
+     * Checks class.
      * @param $className
      * @throws ReflectionException
      */
@@ -189,6 +240,7 @@ class Validator
     }
 
     /**
+     * Set the data holder a runtime cache.
      * @param string $key
      * @param IDataHolder $dataHolder
      */
@@ -199,6 +251,7 @@ class Validator
     }
 
     /**
+     * Returns needed data holder.
      * @param string $key
      * @return IDataHolder|null
      */
@@ -208,6 +261,7 @@ class Validator
     }
 
     /**
+     * Returns last data holder.
      * @return IDataHolder|null
      */
     public static function getLastValidatedData()
@@ -216,6 +270,7 @@ class Validator
     }
 
     /**
+     * Returns validator for form field checks.
      * @return callable
      */
     public static function getDataValidator(): callable
@@ -229,6 +284,7 @@ class Validator
     }
 
     /**
+     * Returns function for upload form field.
      * @return callable
      */
     public static function getUploadFieldValidator(): callable
@@ -264,6 +320,7 @@ class Validator
     }
 
     /**
+     * Returns function for a text field.
      * @return callable
      */
     public static function getTextFieldValidator(): callable
