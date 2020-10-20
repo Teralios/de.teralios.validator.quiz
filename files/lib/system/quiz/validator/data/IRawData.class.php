@@ -3,7 +3,7 @@
 namespace wcf\system\quiz\validator\data;
 
 /**
- * Interface        IRawData
+ * Interface    IRawData
  * @package     QuizCreator
  * @subpackage  wcf\system\quiz\validator\data
  * @author      Karsten (Teralios) Achterrath
