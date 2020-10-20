@@ -36,14 +36,15 @@ class QuizJsonFormFieldValidator extends FormFieldValidator
      * Creates validator object and sets data.
      * @param string $key
      * @param string $jsonString
-     * @return Validator
+     * @return ValidatorError|null
      */
-    public static function getDataValidator(string $key, string $jsonString): Validator
+    public static function validateData(string $key, string $jsonString)
     {
         $validator = new Validator();
         $validator->setData($key, $jsonString);
+        $validator->validate();
 
-        return $validator;
+        return $validator->validate();
     }
 
     /**
@@ -64,7 +65,7 @@ class QuizJsonFormFieldValidator extends FormFieldValidator
 
             // json test
             /** @var ValidatorError $jsonError */
-            $jsonError = static::getDataValidator($name, file_get_contents($file->getLocation()));
+            $jsonError = static::validateData($name, file_get_contents($file->getLocation()));
 
             if ($jsonError !== null) {
                 $formField->addValidationError(
@@ -85,7 +86,7 @@ class QuizJsonFormFieldValidator extends FormFieldValidator
 
             if (!empty($jsonString)) {
                 // test json string
-                $jsonError = static::getDataValidator('text', $jsonString);
+                $jsonError = static::validateData('text', $jsonString);
 
                 if ($jsonError !== null) {
                     $formField->addValidationError(
