@@ -23,6 +23,7 @@ use wcf\system\quiz\validator\Validator;
  */
 class Quiz extends AbstractDataHolder implements IRawData
 {
+    // needed data for data holder.
     const DATA_KEYS = [
         'title' => [true, Validator::TYPE_STRING, null],
         'type' => [true, Validator::TYPE_STRING, ['fun', 'competition']],

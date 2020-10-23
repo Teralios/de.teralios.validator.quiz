@@ -15,6 +15,7 @@ use wcf\system\quiz\validator\Validator;
  */
 class Tag extends AbstractDataHolder
 {
+    // needed data for data holder.
     const DATA_KEYS = [
         'name' => [true, Validator::TYPE_STRING, null]
     ];

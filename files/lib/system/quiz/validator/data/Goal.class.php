@@ -15,6 +15,7 @@ use wcf\system\quiz\validator\Validator;
  */
 class Goal extends AbstractDataHolder
 {
+    // needed data for data holder.
     const DATA_KEYS = [
         'title' => [true, Validator::TYPE_STRING, null],
         'icon' => [true, Validator::TYPE_STRING, null],

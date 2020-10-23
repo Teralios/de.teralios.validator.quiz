@@ -2,6 +2,9 @@
 
 namespace wcf\system\quiz\validator\data;
 
+// imports
+use ReflectionClass;
+
 /**
  * Class        AbstractDataHolder
  * @package     QuizCreator
@@ -66,7 +69,7 @@ abstract class AbstractDataHolder implements IDataHolder
      */
     public static function getDataKeys(): array
     {
-        $reflector = new \ReflectionClass(static::class);
+        $reflector = new ReflectionClass(static::class);
         if ($reflector->hasConstant('DATA_KEYS')) {
             return static::DATA_KEYS;
         }

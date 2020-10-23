@@ -24,6 +24,7 @@ use wcf\system\quiz\validator\Validator;
  */
 class Question extends AbstractDataHolder
 {
+    // needed data for data holder.
     const DATA_KEYS = [
         'question' => [true, Validator::TYPE_STRING, null],
         'optionA' => [true, Validator::TYPE_STRING, null],
