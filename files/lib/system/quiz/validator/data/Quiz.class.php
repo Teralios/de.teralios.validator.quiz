@@ -42,9 +42,10 @@ class Quiz extends AbstractDataHolder implements IRawData
     /**
      * @inheritdoc
      */
-    public function setRawData(string $rawData)
+    public function setRawData(string $rawData): self
     {
         $this->rawData = $rawData;
+        return $this;
     }
 
     /**

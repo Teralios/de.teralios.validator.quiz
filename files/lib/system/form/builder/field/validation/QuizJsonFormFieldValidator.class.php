@@ -26,7 +26,7 @@ class QuizJsonFormFieldValidator extends FormFieldValidator
      * @param bool $upload
      * @return static
      */
-    public static function getFormFieldValidator(string $id, bool $upload = true)
+    public static function getFormFieldValidator(string $id, bool $upload = true): self
     {
         return new static($id, ($upload) ? static::getUploadFunction() : static::getTextFunction());
     }
@@ -38,7 +38,7 @@ class QuizJsonFormFieldValidator extends FormFieldValidator
      * @param string $jsonString
      * @return ValidatorError|null
      */
-    public static function validateData(string $key, string $jsonString)
+    public static function validateData(string $key, string $jsonString): ?ValidatorError
     {
         $validator = new Validator();
         $validator->setData($key, $jsonString);

@@ -15,7 +15,6 @@ interface IRawData
     /**
      * Sets raw json-string.
      * @param string $rawData
-     * @return void
      */
     public function setRawData(string $rawData);
 

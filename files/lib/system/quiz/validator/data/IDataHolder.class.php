@@ -16,15 +16,15 @@ interface IDataHolder
      * Sets a variable to data array.
      * @param string $key
      * @param string|int|IDataHolder $value
-     * @return void
+     * @return self
      */
-    public function setData(string $key, $value);
+    public function setData(string $key, $value): self;
 
     /**
      * Returns data array.
      * @return mixed[]
      */
-    public function getData();
+    public function getData(): array;
 
     /**
      * Returns true if data array has needed $key

@@ -4,7 +4,7 @@
 		<!-- de.teralios.validator.quiz -->
 		<packagename>Validator for Quizzes</packagename>
 		<packagedescription>Includes validator for the importer of quizzes.</packagedescription>
-		<version>1.0.0 RC 1</version>
+		<version>1.1.0 Alpha 1</version>
 		<date>2020-10-25</date>
 		<license>GNU GPLv3</license>
 	</packageinformation>

@@ -85,18 +85,21 @@ class Validator
      * Set data for validation.
      * @param string $key
      * @param string $jsonString
+     * @return static
      */
-    public function setData(string $key, string $jsonString)
+    public function setData(string $key, string $jsonString): self
     {
         $this->key = $key;
         $this->rawData = $jsonString;
+
+        return $this;
     }
 
     /**
      * Validate data.
      * @return ValidatorError|null
      */
-    public function validate()
+    public function validate(): ?ValidatorError
     {
         // json data
         try {
@@ -166,7 +169,7 @@ class Validator
      * @param string $key
      * @return bool
      */
-    protected function dataExists(string $key, array $data)
+    protected function dataExists(string $key, array $data): bool
     {
         return (isset($data[$key]) || (!empty($data[$key]) && $data[$key] !== 0));
     }
@@ -223,7 +226,7 @@ class Validator
      * @param string $dataOptions
      * @return array|IDataHolder|ValidatorError
      */
-    protected function checkArray($values, $dataOptions)
+    protected function checkArray(array $values, string $dataOptions)
     {
         $returnValues = [];
         $index = 1;
@@ -260,10 +263,10 @@ class Validator
 
     /**
      * Checks class.
-     * @param $className
+     * @param string $className
      * @throws ReflectionException
      */
-    protected function checkClass($className)
+    protected function checkClass(string $className)
     {
         $reflection = new ReflectionClass($className);
 
@@ -288,7 +291,7 @@ class Validator
      * @param string $key
      * @return IDataHolder|null
      */
-    public static function getData(string $key)
+    public static function getData(string $key): ?IDataHolder
     {
         return static::$quizStorage[$key] ?? null;
     }
@@ -297,7 +300,7 @@ class Validator
      * Returns last data holder.
      * @return IDataHolder|null
      */
-    public static function getLastValidatedData()
+    public static function getLastValidatedData(): ?IDataHolder
     {
         return static::getData(static::$lastKey);
     }

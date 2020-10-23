@@ -80,7 +80,7 @@ class ValidatorError
      * Set parent error.
      * @param ValidatorError $parent
      */
-    public function setParent(ValidatorError $parent)
+    public function setParent(ValidatorError $parent): void
     {
         $this->parent = $parent;
     }
@@ -89,7 +89,7 @@ class ValidatorError
      * Returns parent error.
      * @return ValidatorError|null
      */
-    public function getParent()
+    public function getParent(): ?ValidatorError
     {
         return $this->parent;
     }

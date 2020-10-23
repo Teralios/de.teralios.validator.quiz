@@ -23,15 +23,17 @@ abstract class AbstractDataHolder implements IDataHolder
     /**
      * @inheritdoc
      */
-    public function setData(string $key, $value)
+    public function setData(string $key, $value): self
     {
         $this->data[$key] = $value;
+
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
