@@ -5,7 +5,7 @@
 		<packagename>Validator for Quizzes</packagename>
 		<packagedescription>Includes validator for the importer of quizzes.</packagedescription>
 		<version>1.0.0 RC 1</version>
-		<date>2020-10-20</date>
+		<date>2020-10-25</date>
 		<license>GNU GPLv3</license>
 	</packageinformation>
 	<authorinformation>
@@ -22,10 +22,5 @@
 	<instructions type="install">
 		<instruction type="file" run="standalone" application="wcf"/>
 		<instruction type="language"/>
-	</instructions>
-
-	<!-- update from beta 4 -->
-	<instructions type="update" fromversion="1.0.0 Beta 4">
-		<instruction type="file" run="standalone" application="wcf"/>
 	</instructions>
 </package>
