@@ -5,7 +5,7 @@
 		<packagename>Validator for Quizzes</packagename>
 		<packagedescription>Includes validator for the importer of quizzes.</packagedescription>
 		<version>1.0.0</version>
-		<date>2020-11-02</date>
+		<date>2020-11-12</date>
 		<license>GNU GPLv3</license>
 	</packageinformation>
 	<authorinformation>
