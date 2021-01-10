@@ -5,8 +5,8 @@ namespace wcf\system\form\builder\field\validation;
 // imports
 use wcf\system\form\builder\field\MultilineTextFormField;
 use wcf\system\form\builder\field\UploadFormField;
-use wcf\system\quiz\validator\Validator;
-use wcf\system\quiz\validator\ValidatorError;
+use wcf\system\validator\Validator;
+use wcf\system\validator\ValidatorError;
 use wcf\util\StringUtil;
 
 /**

@@ -1,20 +1,16 @@
 <?php
 
-namespace wcf\system\quiz\validator;
+namespace wcf\system\validator;
 
 // imports
 use ReflectionClass;
 use ReflectionException;
 use wcf\system\exception\ImplementationException;
 use wcf\system\exception\SystemException;
-use wcf\system\form\builder\field\MultilineTextFormField;
-use wcf\system\form\builder\field\UploadFormField;
-use wcf\system\form\builder\field\validation\FormFieldValidationError;
-use wcf\system\quiz\validator\data\IDataHolder;
-use wcf\system\quiz\validator\data\Quiz;
+use wcf\system\validator\data\IDataHolder;
+use wcf\system\validator\data\quiz\Quiz;
 use wcf\util\ArrayUtil;
 use wcf\util\JSON;
-use wcf\util\StringUtil;
 
 /**
  * Class        Validator
@@ -26,9 +22,9 @@ use wcf\util\StringUtil;
  */
 class Validator
 {
-    const TYPE_STRING = 1;
-    const TYPE_INT = 2;
-    const TYPE_ARRAY = 3;
+    public const TYPE_STRING = 1;
+    public const TYPE_INT = 2;
+    public const TYPE_ARRAY = 3;
 
     /**
      * @var IDataHolder[]
@@ -121,6 +117,7 @@ class Validator
      * @param array $data
      * @param string $className
      * @return ValidatorError|IDataHolder
+     * @throws ReflectionException
      */
     protected function validateData(array $data, string $className)
     {
@@ -266,7 +263,7 @@ class Validator
      * @param string $className
      * @throws ReflectionException
      */
-    protected function checkClass(string $className)
+    protected function checkClass(string $className): void
     {
         $reflection = new ReflectionClass($className);
 
@@ -280,7 +277,7 @@ class Validator
      * @param string $key
      * @param IDataHolder $dataHolder
      */
-    protected static function setValidateData(string $key, IDataHolder $dataHolder)
+    protected static function setValidateData(string $key, IDataHolder $dataHolder): void
     {
         static::$quizStorage[$key] = $dataHolder;
         static::$lastKey = $key;

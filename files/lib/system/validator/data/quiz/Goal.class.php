@@ -1,9 +1,10 @@
 <?php
 
-namespace wcf\system\quiz\validator\data;
+namespace wcf\system\validator\data\quiz;
 
 // imports
-use wcf\system\quiz\validator\Validator;
+use wcf\system\validator\data\AbstractDataHolder;
+use wcf\system\validator\Validator;
 
 /**
  * Class        Goal

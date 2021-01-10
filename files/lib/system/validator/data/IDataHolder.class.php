@@ -1,6 +1,6 @@
 <?php
 
-namespace wcf\system\quiz\validator\data;
+namespace wcf\system\validator\data;
 
 /**
  * Interface        IDataHolder

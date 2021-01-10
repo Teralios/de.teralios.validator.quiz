@@ -1,6 +1,6 @@
 <?php
 
-namespace wcf\system\quiz\validator;
+namespace wcf\system\validator;
 
 /**
  * Class        ValidatorError
