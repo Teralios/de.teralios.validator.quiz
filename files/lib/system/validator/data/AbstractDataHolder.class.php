@@ -73,7 +73,7 @@ abstract class AbstractDataHolder implements IDataHolder
     {
         $reflector = new ReflectionClass(static::class);
         if ($reflector->hasConstant('DATA_KEYS')) {
-            return static::DATA_KEYS;
+            return $reflector->getConstant('DATA_KEYS');
         }
 
         return [];

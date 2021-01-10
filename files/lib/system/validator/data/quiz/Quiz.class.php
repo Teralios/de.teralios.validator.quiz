@@ -4,6 +4,7 @@ namespace wcf\system\validator\data\quiz;
 
 // imports
 use wcf\system\validator\data\AbstractDataHolder;
+use wcf\system\validator\data\IRawData;
 use wcf\system\validator\Validator;
 
 /**

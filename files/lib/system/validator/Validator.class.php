@@ -196,6 +196,7 @@ class Validator
      * @param $value
      * @param $dataOptions
      * @return int|string|IDataHolder|ValidatorError
+     * @throws ReflectionException
      */
     protected function checkValue(string $key, int $type, $value, $dataOptions)
     {
@@ -222,6 +223,7 @@ class Validator
      * @param array $values
      * @param string $dataOptions
      * @return array|IDataHolder|ValidatorError
+     * @throws ReflectionException
      */
     protected function checkArray(array $values, string $dataOptions)
     {
