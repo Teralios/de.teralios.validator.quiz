@@ -14,7 +14,6 @@ use wcf\system\quiz\validator\Validator;
  * @license     GNU General Public License <https://www.gnu.org/licenses/gpl-3.0.txt>
  *
  * @property-read string $title
- * @property-read string $type
  * @property-read string $languageCode
  * @property-read string $description
  * @property-read Question[] $questions
@@ -26,7 +25,6 @@ class Quiz extends AbstractDataHolder implements IRawData
     // needed data for data holder.
     const DATA_KEYS = [
         'title' => [true, Validator::TYPE_STRING, null],
-        'type' => [true, Validator::TYPE_STRING, ['fun', 'competition']],
         'languageCode' => [false, Validator::TYPE_STRING, 2],
         'description' => [true, Validator::TYPE_STRING, null],
         'questions' => [true, Validator::TYPE_ARRAY, Question::class],
